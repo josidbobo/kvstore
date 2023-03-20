@@ -1,4 +1,5 @@
 fn main() {
-    let arguments = std::env::args().skip(1);
-    println!("Hello, world!");
+    let mut arguments = std::env::args().skip(1);
+    let key = arguments.next().unwrap();
+    println!("The key is {}", key);
 }
