@@ -10,10 +10,11 @@ fn main() {
     // Only Macros can take variable number of arguments, Functions can't
     let contents = format!("{}\t{}\n", key, value);
     let write_result = std::fs::write("kv.db", contents);
+    // You can use .unwrap() for the line above to replace the match statement
 
     match write_result{
         Ok(_) => println!("Text successfully written in file"),
-        Err(e) => println!("An error occured"),
+        Err(e) => println!("{}", e),
     }
 
     let database_new = Database::new().expect("Database::new() crashed");
@@ -25,18 +26,20 @@ struct Database{
 
 impl Database{
     fn new() -> Result<Database, std::io::Error> {
-
         // let contents = match std::fs::read_to_string("kv.db") {
         //     Ok(c) => c,
         //     Err(e) => {
         //         return Err(e);
-        //     }
-        // };
-
+        //     }};
+        let mut map = HashMap::new();
         let contents = std::fs::read_to_string("kv.db")?;
+        for line in contents.lines(){
+            let (key, value) = line.split_once('\t').expect("Corrupt Database");
+            map.insert(String::from(key), value.to_owned());  // to_string() also works
+        }
 
         Ok(Database{ 
-            map: HashMap::new(),
+            map: map,
          })
     }
 }
