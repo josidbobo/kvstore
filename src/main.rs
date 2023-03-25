@@ -1,6 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 fn main() {
+
     let mut arguments = std::env::args().skip(1);
+    println!("{:?}", arguments);
 
     // The first argument is moved then the remaining one is the next
     let key = arguments.next().unwrap();
@@ -16,10 +18,13 @@ fn main() {
         Ok(_) => println!("Text successfully written in file"),
         Err(e) => println!("{}", e),
     }
-
+    
     let database_new = Database::new().expect("Database::new() crashed");
+    //database_new.insert(key, value);
+    Database::insert(database_new, key, value);
 }
-
+     
+#[derive(Debug)]
 struct Database{
     map: HashMap<String, String>,
 }
@@ -39,10 +44,30 @@ impl Database{
         }
 
         Ok(Database{ 
-            map: map,
-         })
+            map,
+         }) 
+    } 
+
+    fn insert(mut self, key: String, value: String) {
+        self.map.insert(key, value);
     }
+
+    // fn get_all(mut self) -> Self{
+    //     for (k, v) in self.map.iter(){
+    //         return (k, v);
+    //     }
+    // }
+
 }
  
 
+mod documentation{
+/** 
+ * String -> This is a Struct that contains a. The pointer  b. The length of string literal c. The capacity on the heap
+ * What it does is it helps to grow the string 
+ * while
+ * &str -> This only contains the pointer and length, it is not growable just a reference to data.
+ */
+fn _doc(){}
+}
 
