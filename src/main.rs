@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::{collections::HashMap, path::Path};
 fn main() {
 
     let mut arguments = std::env::args().skip(1);
@@ -41,11 +41,15 @@ impl Database{
         //         return Err(e);
         //     }};
         let mut map = HashMap::new();
+        if Path::new("kv.db").exists() {
         let contents = std::fs::read_to_string("kv.db")?;
         for line in contents.lines(){
             let (key, value) = line.split_once('\t').expect("Corrupt Database");
             map.insert(String::from(key), value.to_owned());  // to_string() also works
         }
+    } else {
+        std::fs::File::create("kv.db")?;
+    }
 
         Ok(Database{ 
             map,
