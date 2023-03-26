@@ -10,23 +10,27 @@ fn main() {
     println!("The key is {} and the value is {}", key, value);
 
     // Only Macros can take variable number of arguments, Functions can't
-    let contents = format!("{}\t{}\n", key, value);
-    let write_result = std::fs::write("kv.db", contents);
+
+    // let contents = format!("{}\t{}\n", key, value);
+    // let write_result = std::fs::write("kv.db", contents);
+
     // You can use .unwrap() for the line above to replace the match statement
 
-    match write_result{
-        Ok(_) => println!("Text successfully written in file"),
-        Err(e) => println!("{}", e),
-    }
+    // match write_result{
+    //     Ok(_) => println!("Text successfully written in file"),
+    //     Err(e) => println!("{}", e),
+    // }
     
-    let database_new = Database::new().expect("Database::new() crashed");
-    //database_new.insert(key, value);
-    Database::insert(database_new, key, value);
+    let mut database_new = Database::new().expect("Database::new() crashed");
+    database_new.insert(key.to_uppercase(), value.clone());
+    Database::insert(&mut database_new, key, value);
+    database_new.flush().unwrap();
 }
      
 #[derive(Debug)]
 struct Database{
     map: HashMap<String, String>,
+    flush: bool
 }
 
 impl Database{
@@ -45,29 +49,54 @@ impl Database{
 
         Ok(Database{ 
             map,
+            flush: false
          }) 
     } 
 
-    fn insert(mut self, key: String, value: String) {
-        self.map.insert(key, value);
+    fn insert(&mut self, key: String, value: String) {
+        self.map.insert(key, value.to_string());
     }
 
-    // fn get_all(mut self) -> Self{
+    fn flush(mut self) -> std::io::Result<()>{
+        self.flush = true;
+        do_flush(&self)
+        //todo!("Finish the return type")
+    }
+
+    // fn get_all(self) -> HashMap<_, _>{
     //     for (k, v) in self.map.iter(){
-    //         return (k, v);
+    //         self.map.get(k);
     //     }
     // }
+}
+
+impl Drop for Database{
+    fn drop(&mut self) {
+        if !self.flush{
+       let _ = do_flush(self);
+        }
+    }
+}
+
+fn do_flush(database : &Database) -> std::io::Result<()>{
+    let mut contents = String::new();
+    for (key, value) in &database.map{
+        contents.push_str(key);
+        contents.push('\t');
+        contents.push_str(value);
+        contents.push('\n');
+    }
+    std::fs::write("kv.db", contents)
 
 }
  
 
 mod documentation{
-/** 
- * String -> This is a Struct that contains a. The pointer  b. The length of string literal c. The capacity on the heap
- * What it does is it helps to grow the string 
- * while
- * &str -> This only contains the pointer and length, it is not growable just a reference to data.
- */
-fn _doc(){}
+//
+ //String -> This is a Struct that contains a. The pointer  b. The length of string literal c. The capacity on the heap
+ //What it does is it helps to grow the string 
+ //while
+  //&str -> This only contains the pointer and length, it is not growable just a reference to data.
+  // clone() creates a reference of a variable and creates a new owned value of the borrowed value
 }
 
