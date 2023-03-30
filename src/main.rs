@@ -97,6 +97,10 @@ fn do_flush(database : &Database) -> std::io::Result<()>{
 
 mod documentation{
 //
+ // This is a way to create and switch to a new branch with git
+ // $ git switch -c my-node-30
+ //
+ //
  //String -> This is a Struct that contains a. The pointer  b. The length of string literal c. The capacity on the heap
  //What it does is it helps to grow the string 
  //while
